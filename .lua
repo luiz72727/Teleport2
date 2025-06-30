@@ -1,51 +1,45 @@
--- Aguarda o jogo carregar
+-- Aguarda o jogo carregar completamente
 repeat task.wait() until game:IsLoaded()
 
+-- Define os principais objetos do jogador
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 
--- Espera o HumanoidRootPart aparecer
+-- Aguarda o personagem carregar com a parte principal do corpo
 repeat task.wait() until character:FindFirstChild("HumanoidRootPart")
 
--- Etapa 1: Teleporta pro portal Nightmare com a nova posição
+-- Teleporta para o portal Nightmare (ajuste a posição se o jogo mudar)
 local nightmarePosition = Vector3.new(417.38, 162, -6)
 character:MoveTo(nightmarePosition)
 print("🟪 Teleportado para o portal Nightmare")
 
--- Etapa 2: Aguarda entrar na partida
+-- Aguarda ser colocado dentro da partida
 task.wait(10)
 
--- Etapa 3: Espera e clica automaticamente no botão "Start"
+-- Procura o botão "Start" e tenta clicar automaticamente
 local gui = player:WaitForChild("PlayerGui")
 local success = false
 
 for i = 1, 60 do -- tenta por até 30 segundos
     for _, obj in pairs(gui:GetDescendants()) do
-        if obj:IsA("TextButton") or obj:IsA("ImageButton") then
-            local texto = (obj.Text or ""):lower()
-            if texto == "start" then
-                print("🟢 Botão Start encontrado, tentando clicar...")
+        if obj:IsA("TextButton") and obj.Text and obj.Text:lower() == "start" then
+            print("🟢 Botão Start encontrado, clicando...")
 
-                -- Clica de várias formas pra garantir
-                pcall(function() obj:Activate() end)
-                pcall(function() obj.MouseButton1Click:Fire() end)
-                pcall(function() obj.MouseButton1Down:Fire() end)
+            pcall(function() obj:Activate() end)
+            pcall(function() obj.MouseButton1Click:Fire() end)
+            pcall(function() obj.MouseButton1Down:Fire() end)
 
-                success = true
-                break
-            end
+            success = true
+            break
         end
     end
-
-    if success then
-        print("🎮 Botão Start clicado com sucesso!")
-        break
-    end
-
+    if success then break end
     task.wait(0.5)
 end
 
-if not success then
-    warn("❌ Botão Start não foi encontrado.")
+if success then
+    print("🎮 Partida iniciada com sucesso!")
+else
+    warn("❌ Não foi possível encontrar o botão Start.")
 end
