@@ -21,21 +21,23 @@ task.wait(10)
 local gui = player:WaitForChild("PlayerGui")
 local success = false
 
-for i = 1, 60 do -- tenta por até 30 segundos
+for i = 1, 60 do -- tenta por até 30 segundos (0.5 * 60)
     for _, obj in pairs(gui:GetDescendants()) do
         if obj:IsA("TextButton") and obj.Text and obj.Text:lower() == "start" then
-            print("🟢 Botão Start encontrado, clicando...")
+            if obj.Visible and obj.Active and obj.AutoButtonColor ~= false then
+                print("🟢 Botão Start encontrado e ativo, clicando...")
 
-            pcall(function() obj:Activate() end)
-            pcall(function() obj.MouseButton1Click:Fire() end)
-            pcall(function() obj.MouseButton1Down:Fire() end)
+                pcall(function() obj:Activate() end)
+                pcall(function() obj.MouseButton1Click:Fire() end)
+                pcall(function() obj.MouseButton1Down:Fire() end)
 
-            success = true
-            break
+                success = true
+                break
+            end
         end
     end
     if success then break end
-    task.wait(0.5)
+    task.wait(0.25) -- reduzido para tentar com mais frequência
 end
 
 if success then
